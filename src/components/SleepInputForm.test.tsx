@@ -5,7 +5,9 @@ import userEvent from "@testing-library/user-event";
 
 describe('SleepInputForm', () => {
     it('should render input fields for hours and minutes, and a submit button', () => {
-        render(<SleepInputForm hoursValue={""} minutesValue={""} onHoursChange={() => {}} onMinutesChange={() => {}}/>);
+        render(<SleepInputForm hoursValue={""} minutesValue={""} onHoursChange={() => {
+        }} onMinutesChange={() => {
+        }}/>);
 
         const hoursInput = screen.getByLabelText(/hours/i);
         expect(hoursInput).toBeInTheDocument();
@@ -36,4 +38,20 @@ describe('SleepInputForm', () => {
 
         expect(mockOnHoursChange).toHaveBeenCalledWith('8');
     });
+
+    it('should call onSubmit when the form is submitted', async () => {
+        const user = userEvent.setup();
+        const mockOnSubmit = vi.fn();
+
+        render(
+            <SleepInputForm hoursValue="8" minutesValue="30" onHoursChange={() => {
+            }} onMinutesChange={() => {
+            }} onSubmit={mockOnSubmit}/>
+        );
+
+        const submitButton = screen.getByRole('button', {name: /record sleep/i});
+        await user.click(submitButton);
+
+        expect(mockOnSubmit).toHaveBeenCalled();
+    })
 })
