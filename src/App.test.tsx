@@ -7,7 +7,9 @@ describe('App', () => {
         render(<App />);
 
         const mainTitle = screen.getByRole('heading', { name: /sleep debt tracker/i });
-
         expect(mainTitle).toBeInTheDocument();
+
+        const sleepForm = screen.getByRole('form');
+        expect(sleepForm).toBeInTheDocument();
     })
 })
