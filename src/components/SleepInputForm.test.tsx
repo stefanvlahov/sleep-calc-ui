@@ -5,7 +5,7 @@ import userEvent from "@testing-library/user-event";
 
 describe('SleepInputForm', () => {
     it('should render input fields for hours and minutes, and a submit button', () => {
-        render(<SleepInputForm/>);
+        render(<SleepInputForm hoursValue={""} minutesValue={""} onHoursChange={() => {}} onMinutesChange={() => {}}/>);
 
         const hoursInput = screen.getByLabelText(/hours/i);
         expect(hoursInput).toBeInTheDocument();
@@ -18,9 +18,7 @@ describe('SleepInputForm', () => {
     })
 
     it('should call the onChange handler when the user types in the hours input', async () => {
-        render(<SleepInputForm/>);
         const user = userEvent.setup();
-
         const mockOnHoursChange = vi.fn();
 
         render(
