@@ -7,7 +7,7 @@ describe('SleepInputForm', () => {
     it('should render input fields for hours and minutes, and a submit button', () => {
         render(<SleepInputForm hoursValue={""} minutesValue={""} onHoursChange={() => {
         }} onMinutesChange={() => {
-        }}/>);
+        }} onSubmit={() => {}}/>);
 
         const hoursInput = screen.getByLabelText(/hours/i);
         expect(hoursInput).toBeInTheDocument();
@@ -26,8 +26,8 @@ describe('SleepInputForm', () => {
         render(
             <SleepInputForm
                 onHoursChange={mockOnHoursChange}
-                onMinutesChange={() => {
-                }}
+                onMinutesChange={() => {}}
+                onSubmit={() => {}}
                 hoursValue=""
                 minutesValue=""
             />
