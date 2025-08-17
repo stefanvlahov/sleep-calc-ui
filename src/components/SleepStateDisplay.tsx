@@ -6,9 +6,9 @@ type SleepStateDisplayProps = {
 function SleepStateDisplay({ sleepDebt, sleepSurplus }: SleepStateDisplayProps) {
     return (
         <div>
-            <h2>Result</h2>
-            <p>Current Sleep Debt: {sleepDebt}</p>
-            <p>Current Sleep Surplus: {sleepSurplus}</p>
+            <h2>Results</h2>
+            <p>Current Sleep Debt: {sleepDebt.toFixed(1)}</p>
+            <p>Current Sleep Surplus: {sleepSurplus.toFixed(1)}</p>
         </div>
     );
 }
