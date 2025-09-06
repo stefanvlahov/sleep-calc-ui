@@ -23,6 +23,13 @@ export default tseslint.config([
         languageOptions: {
             ecmaVersion: 2020,
             globals: globals.browser,
+            parserOptions: {
+                // Enable the project service for rules requiring type information
+                projectService: true,
+                // Point to the project's tsconfig files used for type-aware linting
+                project: ['./tsconfig.json', './tsconfig.app.json', './tsconfig.node.json'],
+                tsconfigRootDir: new URL('.', import.meta.url).pathname,
+            },
         },
     },
 ])
