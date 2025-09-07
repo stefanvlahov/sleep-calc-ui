@@ -1,69 +1,61 @@
-import {useState} from "react";
-import SleepInputForm from "./components/SleepInputForm";
-import SleepStateDisplay from "./components/SleepStateDisplay";
-
-type SleepState = {
-    sleepDebt: number;
-    sleepSurplus: number;
-};
+import { useAuth } from "./context/AuthContext";
+import LoginForm from "./components/LoginForm";
+import RegistrationForm from "./components/RegistrationForm";
+import SleepTracker from "./components/SleepTracker.tsx";
+import { useState } from "react";
 
 function App() {
-    const [hours, setHours] = useState('');
-    const [minutes, setMinutes] = useState('');
-
-    const [sleepState, setSleepState] = useState<SleepState | null>(null);
-
+    const { token, login } = useAuth();
     const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = async () => {
-        setIsLoading(true);
+    const handleRegister = async (username: string, password: string) => {
         setError(null);
-        const formattedMinutes = minutes.padStart(2, '0');
-        const timeSlept = `${hours}:${formattedMinutes}`;
-
         try {
-            const response = await fetch('http://localhost:8080/api/sleep', {
+            const response = await fetch('http://localhost:8080/api/auth/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({timeSlept}),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
             });
-
             if (!response.ok) {
-                throw new Error('Something went wrong with the request');
+                const message = await response.text();
+                throw new Error(message || 'Registration failed.');
             }
-
-            const data: SleepState = await response.json();
-            setSleepState(data);
-
-            setHours('');
-            setMinutes('');
+            alert('Registration successful! Please Log in.');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        } finally {
-            setIsLoading(false);
         }
     };
 
+    const handleLogin = async (username: string, password: string) => {
+        setError(null);
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({username, password }),
+            });
+            if (!response.ok) throw new Error('Login failed. Please check your credentials.');
+            const data = await response.json();
+            if (data.token) {
+                login(data.token);
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        }
+    };
+
+    if (token) {
+        return <SleepTracker />
+    }
+
     return (
         <div>
-            <h1>Sleep Debt Tracker</h1>
-
-            <SleepInputForm hoursValue={hours}
-                            minutesValue={minutes}
-                            onHoursChange={setHours}
-                            onMinutesChange={setMinutes}
-                            onSubmit={handleSubmit}
-            />
-
-            {isLoading && <p>Calculating...</p>}
-            {error && <p style={{color: 'red'}}>Error: {error}</p>}
-
-            {sleepState && (
-                <SleepStateDisplay sleepDebt={sleepState.sleepDebt} sleepSurplus={sleepState.sleepSurplus}/>
-            )}
+            <h1>Welcome to Sleep Tracker</h1>
+            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+            <hr />
+            <RegistrationForm onRegister={handleRegister} />
+            <hr />
+            <LoginForm onLogin={handleLogin} />
         </div>
     );
 }
