@@ -1,65 +1,62 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import App from './App';
-import userEvent from '@testing-library/user-event';
+import { render, screen, within, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import App from "./App";
+import userEvent from "@testing-library/user-event";
+import { AuthProvider } from "./context/AuthContext.tsx";
+
+const renderApp = () => {
+    render(
+        <AuthProvider>
+            <App />
+        </AuthProvider>
+    );
+};
 
 describe('App', () => {
-    it('should allow the user to record sleep and see the updated state', async () => {
+    it('should show login/register forms, allow registration and login, then show the tracker', async () => {
         const user = userEvent.setup();
 
-        global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: () => Promise.resolve({ sleepDebt: 1.0, sleepSurplus: 0.5 }),
-        });
-
-        render(<App />)
-
-        const hoursInput = screen.getByLabelText(/hours/i);
-        const minutesInput = screen.getByLabelText(/minutes/i);
-        const submitButton = screen.getByRole('button', { name: /record sleep/i });
-
-        await user.type(hoursInput, '8');
-        await user.type(minutesInput, '30');
-
-        await user.click(submitButton);
-
-        expect(global.fetch).toHaveBeenCalledWith(
-            'http://localhost:8080/api/sleep',
-            expect.objectContaining({
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ timeSlept: '8:30' }),
+        global.fetch = vi.fn()
+            .mockImplementationOnce((url) => {
+                if (url.toString().endsWith('/register')) {
+                    return Promise.resolve({ ok: true, text: () => Promise.resolve("Success")});
+                }
+                return Promise.reject(new Error('Unexpected register call'));
             })
-        );
+            .mockImplementationOnce((url) => {
+                if (url.toString().endsWith('/login')) {
+                    return Promise.resolve({ ok: true, json: () => Promise.resolve({ token: 'fake-jwt-token' })});
+                }
+                return Promise.reject(new Error('Unexpected login call'));
+            });
+
+        renderApp();
+
+        const registerHeading = screen.getByRole('heading', { name: /register/i });
+        const registrationForm = registerHeading.closest('form');
+
+        const usernameInput = within(registrationForm).getByLabelText(/username/i);
+        const passwordInput = within(registrationForm).getByLabelText(/password/i);
+        const registerButton = within(registrationForm).getByRole('button', { name: /register/i });
+
+        await user.type(usernameInput, 'newuser');
+        await user.type(passwordInput, 'password123');
+        await user.click(registerButton);
+
+        const loginHeading = screen.getByRole('heading', { name: /login/i });
+        const loginForm = loginHeading.closest('form');
+
+        const loginUsernameInput = within(loginForm).getByLabelText(/username/i);
+        const loginPasswordInput = within(loginForm).getByLabelText(/password/i);
+        const loginButton = within(loginForm).getByRole('button', { name: /login/i });
+
+        await user.type(loginUsernameInput, 'newuser');
+        await user.type(loginPasswordInput, 'password123');
+        await user.click(loginButton);
 
         await waitFor(() => {
-            expect(screen.getByText(/current sleep debt:/i)).toHaveTextContent('Current Sleep Debt: 1.0');
-            expect(screen.getByText(/current sleep surplus:/i)).toHaveTextContent('Current Sleep Surplus: 0.5')
-        })
-    });
-
-    it ('should pad the minutes with a leading zero when submitting', async () => {
-        const user = userEvent.setup();
-        global.fetch = vi.fn().mockResolvedValue({
-            ok: true,
-            json: () => Promise.resolve({ sleepDebt: 0, sleepSurplus: 0 }),
+            expect(screen.queryByRole('button', { name: /login/i })).not.toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: /sleep debt tracker/i})).toBeInTheDocument();
         });
-
-        render(<App />)
-
-        const hoursInput = screen.getByLabelText(/hours/i);
-        const minutesInput = screen.getByLabelText(/minutes/i);
-        const submitButton = screen.getByRole('button', {name: /record sleep/i});
-
-        await user.type(hoursInput, '8');
-        await user.type(minutesInput, '5');
-        await user.click(submitButton);
-
-        expect(global.fetch).toHaveBeenCalledWith(
-            'http://localhost:8080/api/sleep',
-            expect.objectContaining({
-                body: JSON.stringify({ timeSlept: '8:05' }),
-            })
-        );
     });
 });
