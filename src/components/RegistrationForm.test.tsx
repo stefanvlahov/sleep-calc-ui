@@ -5,7 +5,7 @@ import RegistrationForm from './RegistrationForm';
 
 describe('RegistrationForm', () => {
     it('should render username and password fields, and a register button', () => {
-        render(<RegistrationForm onRegister={() => {}} />);
+        render(<RegistrationForm onRegister={vi.fn()} />);
 
         expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/password/i)).toBeInTheDocument();

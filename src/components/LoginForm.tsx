@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
-type LoginFormProps = {
-    onLogin: (username: string, password: string) => void;
-};
+interface LoginFormProps {
+    onLogin: (username: string, password: string) => Promise<void>;
+}
 
 function LoginForm({ onLogin }: LoginFormProps) {
     const [username, setUsername] = useState('');
@@ -10,11 +10,11 @@ function LoginForm({ onLogin }: LoginFormProps) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        onLogin(username, password);
+        void onLogin(username, password);
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label={"Login Form"}>
             <h2>Login</h2>
             <div>
                 <label htmlFor="login-username">Username</label>

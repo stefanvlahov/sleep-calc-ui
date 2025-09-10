@@ -1,4 +1,4 @@
-import { useAuth } from "./context/AuthContext";
+import { useAuth } from "./hooks/useAuth.ts";
 import LoginForm from "./components/LoginForm";
 import RegistrationForm from "./components/RegistrationForm";
 import SleepTracker from "./components/SleepTracker.tsx";
@@ -35,7 +35,7 @@ function App() {
                 body: JSON.stringify({username, password }),
             });
             if (!response.ok) throw new Error('Login failed. Please check your credentials.');
-            const data = await response.json();
+            const data = await response.json() as { token: string };
             if (data.token) {
                 login(data.token);
             }

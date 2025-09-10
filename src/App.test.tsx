@@ -2,7 +2,7 @@ import { render, screen, within, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import App from "./App";
 import userEvent from "@testing-library/user-event";
-import { AuthProvider } from "./context/AuthContext.tsx";
+import { AuthProvider } from "./context/AuthProvider.tsx";
 
 const renderApp = () => {
     render(
@@ -17,13 +17,13 @@ describe('App', () => {
         const user = userEvent.setup();
 
         global.fetch = vi.fn()
-            .mockImplementationOnce((url) => {
+            .mockImplementationOnce((url: string | URL) => {
                 if (url.toString().endsWith('/register')) {
                     return Promise.resolve({ ok: true, text: () => Promise.resolve("Success")});
                 }
                 return Promise.reject(new Error('Unexpected register call'));
             })
-            .mockImplementationOnce((url) => {
+            .mockImplementationOnce((url: string | URL) => {
                 if (url.toString().endsWith('/login')) {
                     return Promise.resolve({ ok: true, json: () => Promise.resolve({ token: 'fake-jwt-token' })});
                 }
@@ -32,8 +32,7 @@ describe('App', () => {
 
         renderApp();
 
-        const registerHeading = screen.getByRole('heading', { name: /register/i });
-        const registrationForm = registerHeading.closest('form');
+        const registrationForm = screen.getByRole('form', { name: /registration form/i});
 
         const usernameInput = within(registrationForm).getByLabelText(/username/i);
         const passwordInput = within(registrationForm).getByLabelText(/password/i);
@@ -43,8 +42,7 @@ describe('App', () => {
         await user.type(passwordInput, 'password123');
         await user.click(registerButton);
 
-        const loginHeading = screen.getByRole('heading', { name: /login/i });
-        const loginForm = loginHeading.closest('form');
+        const loginForm = screen.getByRole('form', { name: /login form/i});
 
         const loginUsernameInput = within(loginForm).getByLabelText(/username/i);
         const loginPasswordInput = within(loginForm).getByLabelText(/password/i);
