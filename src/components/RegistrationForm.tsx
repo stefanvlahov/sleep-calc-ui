@@ -1,8 +1,8 @@
 import React, { useState }  from "react";
 
-type RegistrationFormProps = {
-    onRegister: (username: string, password: string) => void;
-};
+interface RegistrationFormProps {
+    onRegister: (username: string, password: string) => Promise<void>;
+}
 
 function RegistrationForm({ onRegister }: RegistrationFormProps) {
     const [username, setUsername] = useState('');
@@ -10,11 +10,11 @@ function RegistrationForm({ onRegister }: RegistrationFormProps) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        onRegister(username, password);
+        void onRegister(username, password);
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label={"Registration Form"}>
             <h2>Register</h2>
             <div>
                 <label htmlFor="username">Username</label>

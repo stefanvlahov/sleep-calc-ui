@@ -5,7 +5,7 @@ import LoginForm from './LoginForm';
 
 describe('LoginForm', () => {
     it('should render username and password fields, and a login button', () => {
-        render(<LoginForm onLogin={() => {}} />);
+        render(<LoginForm onLogin={vi.fn()} />);
 
         expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/password/i)).toBeInTheDocument();

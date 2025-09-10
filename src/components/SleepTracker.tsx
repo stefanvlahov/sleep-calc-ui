@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import SleepInputForm from "./SleepInputForm";
 import SleepStateDisplay from "./SleepStateDisplay";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth.ts";
 
-type SleepState = {
+interface SleepState {
     sleepDebt: number;
     sleepSurplus: number;
 }
@@ -24,13 +24,13 @@ function SleepTracker() {
                     headers: {'Authorization': `Bearer ${token}`}
                 });
                 if (!response.ok) throw new Error('Failed to fetch initial state');
-                const data: SleepState = await response.json();
+                const data = await response.json() as SleepState;
                 setSleepState(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An unknown error occurred');
             }
         };
-        fetchInitialState();
+        void fetchInitialState();
     }, [token]);
 
     const handleSubmit = async () => {
@@ -47,7 +47,7 @@ function SleepTracker() {
                 body: JSON.stringify({ timeSlept }),
             });
             if (!response.ok) throw new Error('Something went wrong with the request');
-            const data: SleepState = await response.json();
+            const data = await response.json() as SleepState;
             setSleepState(data);
             setHours('');
             setMinutes('');
@@ -60,7 +60,7 @@ function SleepTracker() {
 
     return (
         <div>
-            <button onClick={logout} style={{ float: 'right' }}>Logout</button>
+            <button onClick={logout} type="button" style={{ float: 'right' }}>Logout</button>
             <h1>Sleep Debt Tracker</h1>
 
             <SleepInputForm hoursValue={hours} minutesValue={minutes} onHoursChange={setHours} onMinutesChange={setMinutes} onSubmit={handleSubmit} />

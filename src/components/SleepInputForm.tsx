@@ -1,12 +1,12 @@
 import React from "react";
 
-type SleepInputFormProps = {
+interface SleepInputFormProps {
     hoursValue: string;
     minutesValue: string;
     onHoursChange: (value: string) => void;
     onMinutesChange: (value: string) => void;
-    onSubmit: () => void;
-};
+    onSubmit: () => Promise<void>;
+}
 
 function SleepInputForm({
                             hoursValue,
@@ -18,7 +18,7 @@ function SleepInputForm({
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        onSubmit();
+        void onSubmit();
     };
 
     return (

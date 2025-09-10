@@ -1,7 +1,7 @@
-type SleepStateDisplayProps = {
+interface SleepStateDisplayProps {
     sleepDebt: number;
     sleepSurplus: number;
-};
+}
 
 function SleepStateDisplay({ sleepDebt, sleepSurplus }: SleepStateDisplayProps) {
     return (
