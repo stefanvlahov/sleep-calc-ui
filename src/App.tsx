@@ -50,7 +50,7 @@ function App() {
 
     return (
         <div>
-            <h1>Welcome to Sleep Tracker</h1>
+            <h1 className="text-3xl font-bold underline text-blue-500">Welcome to Sleep Tracker</h1>
             {error && <p style={{ color: 'red' }}>Error: {error}</p>}
             <hr />
             <RegistrationForm onRegister={handleRegister} />
