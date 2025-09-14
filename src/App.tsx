@@ -1,8 +1,7 @@
 import { useAuth } from "./hooks/useAuth.ts";
-import LoginForm from "./components/LoginForm";
-import RegistrationForm from "./components/RegistrationForm";
 import SleepTracker from "./components/SleepTracker.tsx";
 import { useState } from "react";
+import AuthPage from "./pages/AuthPage.tsx";
 
 function App() {
     const { token, login } = useAuth();
@@ -48,16 +47,7 @@ function App() {
         return <SleepTracker />
     }
 
-    return (
-        <div>
-            <h1 className="text-3xl font-bold underline text-blue-500">Welcome to Sleep Tracker</h1>
-            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-            <hr />
-            <RegistrationForm onRegister={handleRegister} />
-            <hr />
-            <LoginForm onLogin={handleLogin} />
-        </div>
-    );
+    return <AuthPage onLogin={handleLogin} onRegister={handleRegister} error={error}/>
 }
 
 export default App
