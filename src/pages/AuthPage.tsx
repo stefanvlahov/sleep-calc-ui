@@ -56,8 +56,8 @@ function AuthPage({ onRegister, onLogin, error }: AuthPageProps) {
             </div>
 
             {/* Right Panel: Image and Branding */}
-            <div className="hidden md:flex w-1/2 bg-gray-100 items-center justify-center p-12 flex-col text-center">
-                <img src={sleepingPhoto} alt="Person sleeping peacefully" className="max-w-sm mb-8"/>
+            <div className="hidden md:block w-1/2">
+                <img src={sleepingPhoto} alt="Person sleeping peacefully" className="w-full max-h-screen object-cover"/>
             </div>
         </div>
     );
