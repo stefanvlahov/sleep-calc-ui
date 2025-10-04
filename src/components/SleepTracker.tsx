@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import SleepInputForm from "./SleepInputForm";
 import SleepStateDisplay from "./SleepStateDisplay";
 import { useAuth } from "../hooks/useAuth.ts";
+import Layout from "./Layout";
 
 interface SleepState {
     sleepDebt: number;
@@ -9,7 +10,7 @@ interface SleepState {
 }
 
 function SleepTracker() {
-    const { token, logout } = useAuth();
+    const { token } = useAuth();
     const [hours, setHours] = useState('');
     const [minutes, setMinutes] = useState('');
     const [sleepState, setSleepState] = useState<SleepState | null>(null);
@@ -59,17 +60,17 @@ function SleepTracker() {
     };
 
     return (
-        <div>
-            <button onClick={logout} type="button" style={{ float: 'right' }}>Logout</button>
-            <h1>Sleep Debt Tracker</h1>
+        <Layout>
+            <div>
 
-            <SleepInputForm hoursValue={hours} minutesValue={minutes} onHoursChange={setHours} onMinutesChange={setMinutes} onSubmit={handleSubmit} />
-            {isLoading && <p>Calculating...</p>}
-            {error && <p style={{ color: 'red' }}>Error: </p>}
-            {sleepState && (
-                <SleepStateDisplay sleepDebt={sleepState.sleepDebt} sleepSurplus={sleepState.sleepSurplus} />
-            )}
-        </div>
+                <SleepInputForm hoursValue={hours} minutesValue={minutes} onHoursChange={setHours} onMinutesChange={setMinutes} onSubmit={handleSubmit} />
+                {isLoading && <p>Calculating...</p>}
+                {error && <p style={{ color: 'red' }}>Error: </p>}
+                {sleepState && (
+                    <SleepStateDisplay sleepDebt={sleepState.sleepDebt} sleepSurplus={sleepState.sleepSurplus} />
+                )}
+            </div>
+        </Layout>
     );
 }
 
