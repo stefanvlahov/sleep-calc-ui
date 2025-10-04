@@ -28,10 +28,10 @@ function Navbar() {
                         <button
                             type="button"
                             onClick={logout}
-                            className="rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 focus-visible:outline focus-visible:outline-2  focus-visible:outline-offset-2 focus-visible:outline-blue-600 mr-4"
+                            className="rounded-md border border-gray-300 bg-white px-3 py-2 test-sm font-semibold text-gray-700 shadow-sm hover:border-blue-500 hover:text-blue-600"
                             >Logout
                         </button>
-                        <div className="relative">
+                        <div className="relative ml-4">
                             <img src={userAvatar} className="w-8 h-8 rounded-full" alt="User Avatar"/>
                         </div>
                     </div>
