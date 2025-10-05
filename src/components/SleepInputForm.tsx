@@ -16,26 +16,49 @@ function SleepInputForm({
                             onSubmit,
                         }: SleepInputFormProps) {
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         void onSubmit();
     };
 
     return (
-        <form aria-label={"Sleep Input Form"} onSubmit={handleSubmit}>
-            <div>
-                <label htmlFor="hours">Hours</label>
-                <input id="hours" type="number" value={hoursValue} onChange={(e) => onHoursChange(e.target.value)}/>
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
+            <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-800">Log Your Sleep</h2>
+                <p className="text-gray-600">Enter your sleep details below to track your sleep patterns.</p>
             </div>
 
-            <div>
-                <label htmlFor="minutes">Minutes</label>
-                <input id="minutes" type="number" value={minutesValue}
-                       onChange={(e) => onMinutesChange(e.target.value)}/>
-            </div>
+            <form onSubmit={handleFormSubmit} className="space-y-6" aria-label="Sleep Input Form">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Sleep Duration</label>
+                    <div className="flex space-x-4">
+                        <input
+                            type="number"
+                            value={hoursValue}
+                            onChange={(e) => onHoursChange(e.target.value)}
+                            placeholder="Hours"
+                            className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                        <input
+                            type="number"
+                            value={minutesValue}
+                            onChange={(e) => onMinutesChange(e.target.value)}
+                            placeholder="Minutes"
+                            className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                </div>
 
-            <button type="submit">Record Sleep</button>
-        </form>
+                <button
+                    type="submit"
+                    className="w-full border-gray-300 bg-white px-3 py-2 test-sm font-semibold text-gray-700 shadow-sm hover:border-blue-500 hover:text-blue-600"
+                >
+                    Log Sleep
+                </button>
+            </form>
+        </div>
     );
 }
 
