@@ -16,12 +16,13 @@ function SleepTracker() {
     const [sleepState, setSleepState] = useState<SleepState | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
 
     useEffect(() => {
         const fetchInitialState = async () => {
             if (!token) return;
             try {
-                const response = await fetch('http://localhost:8080/api/sleep/state', {
+                const response = await fetch('/api/sleep/state', {
                     headers: {'Authorization': `Bearer ${token}`}
                 });
                 if (!response.ok) throw new Error('Failed to fetch initial state');
@@ -34,12 +35,19 @@ function SleepTracker() {
         void fetchInitialState();
     }, [token]);
 
+    const handleDateChange = (date: Date | null) => {
+        if (date) {
+            setSelectedDate(date);
+        }
+    };
+
     const handleSubmit = async () => {
+        console.log("Date to submit: ", selectedDate);
         setIsLoading(true);
         setError(null);
         const timeSlept = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
         try {
-            const response = await fetch('http://localhost:8080/api/sleep', {
+            const response = await fetch('/api/sleep', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,9 +71,9 @@ function SleepTracker() {
         <Layout>
             <div>
 
-                <SleepInputForm hoursValue={hours} minutesValue={minutes} onHoursChange={setHours} onMinutesChange={setMinutes} onSubmit={handleSubmit} />
+                <SleepInputForm hoursValue={hours} minutesValue={minutes} onHoursChange={setHours} onMinutesChange={setMinutes} onSubmit={handleSubmit} selectedDate={selectedDate} onDateChange={handleDateChange}/>
                 {isLoading && <p>Calculating...</p>}
-                {error && <p style={{ color: 'red' }}>Error: </p>}
+                {error && <p style={{ color: 'red' }}>Error: {error}</p>}
                 {sleepState && (
                     <SleepStateDisplay sleepDebt={sleepState.sleepDebt} sleepSurplus={sleepState.sleepSurplus} />
                 )}
