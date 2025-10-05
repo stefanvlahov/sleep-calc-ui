@@ -14,17 +14,36 @@ function RegistrationForm({ onRegister }: RegistrationFormProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit} aria-label={"Registration Form"}>
-            <h2>Register</h2>
+        <form onSubmit={handleSubmit} aria-label={"Registration Form"} className="space-y-6">
             <div>
-                <label htmlFor="username">Username</label>
-                <input id="username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+                <label htmlFor="register-username" className="block text-sm font-medium text-gray-700">Username</label>
+                <div className="mt-1">
+                    <input
+                        id="register-username"
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    />
+                </div>
             </div>
             <div>
-                <label htmlFor="password">Password</label>
-                <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <label htmlFor="register-password" className="block text-sm font-medium text-gray-700">Password</label>
+                <div className="mt-1">
+                    <input
+                        id="register-password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    />
+                </div>
             </div>
-            <button type="submit">Register</button>
+            <button
+                type="submit"
+                className="w-full bg-blue-500 text-blue-500 py-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Register</button>
         </form>
     );
 }
