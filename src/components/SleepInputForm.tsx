@@ -1,4 +1,6 @@
 import React from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface SleepInputFormProps {
     hoursValue: string;
@@ -6,6 +8,8 @@ interface SleepInputFormProps {
     onHoursChange: (value: string) => void;
     onMinutesChange: (value: string) => void;
     onSubmit: () => Promise<void>;
+    selectedDate: Date;
+    onDateChange: (date: Date | null) => void;
 }
 
 function SleepInputForm({
@@ -14,6 +18,8 @@ function SleepInputForm({
                             onHoursChange,
                             onMinutesChange,
                             onSubmit,
+                            selectedDate,
+                            onDateChange,
                         }: SleepInputFormProps) {
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,6 +35,16 @@ function SleepInputForm({
             </div>
 
             <form onSubmit={handleFormSubmit} className="space-y-6" aria-label="Sleep Input Form">
+                <div>
+                    <label htmlFor="sleep-date" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <DatePicker
+                        id="sleep-date"
+                        selected={selectedDate}
+                        onChange={onDateChange}
+                        dateFormat="MM/dd/yyyy"
+                        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Sleep Duration</label>
                     <div className="flex space-x-4">
