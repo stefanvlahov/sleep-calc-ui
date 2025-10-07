@@ -1,20 +1,25 @@
 ### Sleep Debt Calculator UI (Vite + React + TypeScript)
 
-Last updated: 2025-09-09
+Last updated: 2025-10-07
 
-A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React + TS template) and tested with Vitest + React Testing Library. This UI now supports JWT-based authentication for registration, login, and authenticated API calls.
+A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React + TS template) and tested with Vitest + React Testing Library. This UI now supports JWT-based authentication for registration, login, and authenticated API calls with a modern, responsive UI built with Tailwind CSS.
 
 ---
 
 ### Features
 - JWT auth: Register, Login, Logout
+- Modern, responsive UI built with Tailwind CSS
+- Unified authentication page with split-screen design
+- Navigation bar with user avatar and quick logout
+- Date selection for sleep entries (using DatePicker)
 - Persisted session via localStorage
 - Authenticated calls to protected endpoints with Bearer token
-- Record sleep by entering hours and minutes
+- Record sleep by entering hours, minutes, and date
 - Automatically pads minutes with a leading zero (e.g., 8:5 becomes 8:05)
 - Displays loading and error states during API calls
+- Card-based layout for better visual hierarchy
 - Shows formatted results to one decimal place: Current Sleep Debt and Current Sleep Surplus
-- Unit tests for core UI interactions
+- Comprehensive unit tests for all major components
 
 ---
 
@@ -24,6 +29,7 @@ A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React +
 - A running backend API
   - Auth endpoints: POST http://localhost:8080/api/auth/register and POST http://localhost:8080/api/auth/login
   - Sleep endpoints (protected): GET http://localhost:8080/api/sleep/state and POST http://localhost:8080/api/sleep
+- Note: The Vite dev server proxies `/api` requests to `http://localhost:8080` automatically
 
 ---
 
@@ -39,21 +45,24 @@ A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React +
 
 ### Usage
 1) Authentication flow
+- The app presents a unified AuthPage with toggle between Login and Registration
 - Register with a username and password (sends POST /api/auth/register)
 - Login with the same credentials (sends POST /api/auth/login)
   - On success, a JWT token is returned and stored in localStorage under key authToken
-  - The app switches to the authenticated view
-- Logout at any time (clears token from state and localStorage)
+  - The app switches to the authenticated view with navigation bar
+- Logout at any time using the button in the navbar (clears token from state and localStorage)
 
 2) Tracking sleep (requires login)
-- Enter Hours and Minutes in the form and press “Record Sleep”.
+- Select a date using the date picker (defaults to today)
+- Enter Hours and Minutes in the form
+- Press "Log Sleep" button
 - The app will call the backend with payload: { "timeSlept": "HH:MM" } to POST /api/sleep,
-  including Authorization: Bearer <token>.
-- On success, the UI shows:
+  including Authorization: Bearer <token>
+- On success, the UI shows in a card-based layout:
     - Current Sleep Debt: <value>
     - Current Sleep Surplus: <value>
-- The app also fetches your initial state from GET /api/sleep/state when you log in.
-- If a request fails or returns non-OK, an error message is shown.
+- The app also fetches your initial state from GET /api/sleep/state when you log in
+- If a request fails or returns non-OK, an error message is shown
 
 ---
 
@@ -73,6 +82,17 @@ Example
 
 Protected requests
 - Include the Authorization header: 'Authorization': `Bearer ${token}` when calling protected endpoints like /api/sleep and /api/sleep/state.
+
+---
+
+### Styling & UI
+- Built with Tailwind CSS v4.1.13
+- Responsive design with mobile-first approach
+- PostCSS configuration for processing Tailwind directives
+- Custom color scheme with blue accents for interactive elements
+- Card-based components with shadows and rounded corners
+- Focus states for accessibility
+- Split-screen authentication page with background image
 
 ---
 
@@ -109,36 +129,60 @@ Notes
 
 ### Project Structure
 - src/
-    - App.tsx – Main container; orchestrates auth flow and, once logged in, sleep tracking
+    - App.tsx – Main container; orchestrates auth flow and renders AuthPage or SleepTracker
+    - pages/
+        - AuthPage.tsx – Unified authentication page with login/register toggle and split-screen layout
     - components/
-        - SleepInputForm.tsx – Controlled inputs for hours and minutes, submit handling
-        - SleepStateDisplay.tsx – Results section showing sleep debt and surplus
+        - Layout.tsx – Wrapper component providing navbar and consistent page structure
+        - Navbar.tsx – Navigation bar with branding, menu items, logout button, and user avatar
+        - SleepInputForm.tsx – Form with date picker, hours and minutes inputs, submit handling
+        - SleepStateDisplay.tsx – Card-based results section showing sleep debt and surplus
         - SleepTracker.tsx – Authenticated view that fetches initial state and records sleep with token
-        - LoginForm.tsx – Collects username/password and triggers login
-        - RegistrationForm.tsx – Collects username/password and triggers registration
+        - LoginForm.tsx – Collects username/password and triggers login with Tailwind styling
+        - RegistrationForm.tsx – Collects username/password and triggers registration with Tailwind styling
     - context/
         - AuthContext.ts – React context type and instance
         - AuthProvider.tsx – Provides token, login, logout (persists token to localStorage)
     - hooks/
         - useAuth.ts – Access the auth context (must be used under AuthProvider)
+    - assets/
+        - sleeping_photo.png – Background image for authentication page
+        - userAvatar.png – Default user avatar displayed in navbar
     - main.tsx – React root and bootstrap, wraps App with AuthProvider
     - setupTests.ts – Testing setup (Vitest + Testing Library)
+    - index.css – Global styles and Tailwind CSS directives
 
 ---
 
 ### Testing
 - Unit tests use Vitest and React Testing Library:
+    - src/App.test.tsx – App-level integration tests
+    - src/pages/AuthPage.test.tsx – Authentication page interactions and toggle behavior
     - src/components/LoginForm.test.tsx – Form interactions for login
+    - src/components/RegistrationForm.test.tsx – Form interactions for registration
     - src/components/SleepInputForm.test.tsx – Component-level tests for inputs and submission
+    - src/components/SleepTracker.test.tsx – Sleep tracking component with mocked API calls
 - Run tests: npm run test
 
 ---
 
 ### Configuration Notes
-- API base URL is currently hard-coded as http://localhost:8080 in App.tsx and SleepTracker.tsx.
-    - To target another backend, update those fetch URLs or introduce an environment variable (e.g., VITE_API_BASE_URL) and read it via import.meta.env.VITE_API_BASE_URL.
-- Auth token persistence uses localStorage under key authToken.
-- If you encounter CORS errors in development, ensure the backend allows requests from the Vite dev server origin (e.g., http://localhost:5173) or configure a Vite dev server proxy.
+- API calls use relative URLs (/api/...) which are proxied to http://localhost:8080 via Vite dev server
+    - Proxy configuration is in vite.config.ts
+    - To target another backend in production, update the backend URL or use environment variables
+- Auth token persistence uses localStorage under key authToken
+- Tailwind CSS configuration uses PostCSS (see postcss.config.ts)
+- If you encounter CORS errors in development, ensure the backend allows requests from the Vite dev server origin (e.g., http://localhost:5173)
+
+---
+
+### Key Dependencies
+- **React** v19.1.1 – UI library
+- **Vite** v7.1.2 – Build tool and dev server
+- **Tailwind CSS** v4.1.13 – Utility-first CSS framework
+- **react-datepicker** v8.7.0 – Date picker component
+- **Vitest** v3.2.4 – Unit testing framework
+- **TypeScript** v5.8.3 – Type safety
 
 ---
 
