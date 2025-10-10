@@ -54,8 +54,8 @@ describe('SleepTracker', () => {
 
         await screen.findByText(/5.0 hours/i);
 
-        const hoursInput = screen.getByPlaceholderText(/hours/i);
-        const minutesInput = screen.getByPlaceholderText(/minutes/i);
+        const hoursInput = screen.getByPlaceholderText('8');
+        const minutesInput = screen.getByPlaceholderText(/e\.g\., 30/i);
         const logSleepButton = screen.getByRole('button', { name: /log sleep/i });
 
         await user.type(hoursInput, '9');

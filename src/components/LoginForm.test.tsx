@@ -7,8 +7,8 @@ describe('LoginForm', () => {
     it('should render username and password fields, and a login button', () => {
         render(<LoginForm onLogin={vi.fn()} />);
 
-        expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-        expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/email or username/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/password/i)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
     })
 
@@ -18,8 +18,8 @@ describe('LoginForm', () => {
 
         render(<LoginForm onLogin={mockOnLogin} />);
 
-        const usernameInput = screen.getByLabelText(/username/i);
-        const passwordInput = screen.getByLabelText(/password/i);
+        const usernameInput = screen.getByPlaceholderText(/email or username/i);
+        const passwordInput = screen.getByPlaceholderText(/password/i);
         const loginButton = screen.getByRole('button', { name: /login/i });
 
         await user.type(usernameInput, 'testuser');

@@ -6,15 +6,16 @@ import userEvent from "@testing-library/user-event";
 describe('SleepInputForm', () => {
     it('should render input fields for hours and minutes, and a submit button', () => {
         render(<SleepInputForm hoursValue={""} minutesValue={""} onHoursChange={() => vi.fn()}
-                               onMinutesChange={() => vi.fn()} onSubmit={() => vi.fn()}/>);
+                               onMinutesChange={() => vi.fn()} onSubmit={async () => {}}
+                               selectedDate={new Date()} onDateChange={() => vi.fn()}/>);
 
-        const hoursInput = screen.getByLabelText(/hours/i);
+        const hoursInput = screen.getByPlaceholderText('8');
         expect(hoursInput).toBeInTheDocument();
 
-        const minutesInput = screen.getByLabelText(/minutes/i);
+        const minutesInput = screen.getByPlaceholderText(/e\.g\., 30/i);
         expect(minutesInput).toBeInTheDocument();
 
-        const submitButton = screen.getByRole('button', {name: /record sleep/i});
+        const submitButton = screen.getByRole('button', {name: /log sleep/i});
         expect(submitButton).toBeInTheDocument();
     })
 
@@ -26,13 +27,15 @@ describe('SleepInputForm', () => {
             <SleepInputForm
                 onHoursChange={mockOnHoursChange}
                 onMinutesChange={() => vi.fn()}
-                onSubmit={() => vi.fn()}
+                onSubmit={async () => {}}
                 hoursValue=""
                 minutesValue=""
+                selectedDate={new Date()}
+                onDateChange={() => vi.fn()}
             />
         );
 
-        const hoursInput = screen.getByLabelText(/hours/i);
+        const hoursInput = screen.getByPlaceholderText('8');
         await user.type(hoursInput, '8');
 
         expect(mockOnHoursChange).toHaveBeenCalledWith('8');
@@ -44,10 +47,11 @@ describe('SleepInputForm', () => {
 
         render(
             <SleepInputForm hoursValue="8" minutesValue="30" onHoursChange={() => vi.fn()}
-                            onMinutesChange={() => vi.fn()} onSubmit={mockOnSubmit}/>
+                            onMinutesChange={() => vi.fn()} onSubmit={mockOnSubmit}
+                            selectedDate={new Date()} onDateChange={() => vi.fn()}/>
         );
 
-        const submitButton = screen.getByRole('button', {name: /record sleep/i});
+        const submitButton = screen.getByRole('button', {name: /log sleep/i});
         await user.click(submitButton);
 
         expect(mockOnSubmit).toHaveBeenCalled();

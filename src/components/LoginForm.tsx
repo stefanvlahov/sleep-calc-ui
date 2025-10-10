@@ -14,36 +14,35 @@ function LoginForm({ onLogin }: LoginFormProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit} aria-label={"Login Form"} className="space-y-6">
+        <form onSubmit={handleSubmit} aria-label={"Login Form"} className="space-y-4">
             <div>
-                <label htmlFor="login-username" className="block text-sm font-medium text-gray-700">Username</label>
-                <div className="mt-1">
-                    <input
-                        id="login-username"
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        required
-                    />
-                </div>
+                <input
+                    id="login-username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Email or Username"
+                    className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    required
+                />
             </div>
             <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-gray-700">Password</label>
-                <div className="mt-1">
-                    <input
-                        id="login-password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        required
-                    />
-                </div>
+                <input
+                    id="login-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    required
+                />
+            </div>
+            <div className="text-left">
+                <a href="#" className="text-sm text-blue-500 hover:underline">Forgot Password?</a>
             </div>
             <button
                 type="submit"
-                className="w-full bg-blue-500 text-blue-500 py-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Login</button>
+                className="w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Login</button>
         </form>
     );
 }
