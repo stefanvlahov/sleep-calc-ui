@@ -22,7 +22,7 @@ function SleepTracker() {
         const fetchInitialState = async () => {
             if (!token) return;
             try {
-                const response = await fetch('/api/sleep/state', {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/sleep/state`, {
                     headers: {'Authorization': `Bearer ${token}`}
                 });
                 if (!response.ok) throw new Error('Failed to fetch initial state');
@@ -47,7 +47,7 @@ function SleepTracker() {
         setError(null);
         const timeSlept = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
         try {
-            const response = await fetch('/api/sleep', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/sleep`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
