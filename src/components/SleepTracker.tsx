@@ -48,11 +48,14 @@ function SleepTracker() {
         setIsLoading(true);
         setError(null);
         const timeSlept = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+
+        const dateString = selectedDate.toISOString().split('T')[0];
+
         try {
             const response = await fetchWithAuth('/api/sleep', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ timeSlept }),
+                body: JSON.stringify({ timeSlept, date: dateString }),
             }, logout);
 
             if (!response.ok) throw new Error('Something went wrong with the request');
@@ -60,6 +63,7 @@ function SleepTracker() {
             setSleepState(data);
             setHours('');
             setMinutes('');
+            setSelectedDate(new Date());
         } catch (err) {
             if ((err as Error).message === 'Unauthorized: Please log in again.') {
                 setError(err instanceof Error ? err.message : 'An unknown error occurred');
