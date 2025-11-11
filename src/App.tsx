@@ -2,6 +2,8 @@ import { useAuth } from "./hooks/useAuth.ts";
 import SleepTracker from "./components/SleepTracker.tsx";
 import { useState } from "react";
 import AuthPage from "./pages/AuthPage.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
     const { token, login } = useAuth();
@@ -44,10 +46,21 @@ function App() {
     };
 
     if (token) {
-        return <SleepTracker />
+        return (
+            <Routes>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/log-sleep" element={<SleepTracker />} />
+                <Route path="*" element={<Navigate to="/dashboard" />} />
+            </Routes>
+        );
     }
 
-    return <AuthPage onLogin={handleLogin} onRegister={handleRegister} error={error}/>
+    return (
+        <Routes>
+            <Route path="/login" element={<AuthPage onLogin={handleLogin} onRegister={handleRegister} error={error} />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+    );
 }
 
-export default App
+export default App;
