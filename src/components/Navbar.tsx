@@ -1,6 +1,12 @@
 import { useAuth } from "../hooks/useAuth.ts";
 import userAvatar from '../assets/userAvatar.png'
 import moonImage from '../assets/moon.jpeg'
+import { NavLink } from "react-router-dom";
+
+const getNavLinkClass = ({ isActive}: { isActive: boolean }) =>
+    isActive
+        ? 'inline-flex items-center border-b-2 border-blue-500 px-1 pt-1 text-sm font-medium text-gray-900'
+        : 'inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700';
 
 function Navbar() {
     const { logout } = useAuth()
@@ -15,15 +21,15 @@ function Navbar() {
                             <span className="text-xl font-bold text-gray-900">SleepTracker</span>
                         </div>
                         <div className="hidden sm:ml-8 sm:flex sm:space-x-8">
-                            <a href="#" className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-900 hover:border-gray-300 hover:text-gray-700">
+                            <NavLink to="/dashboard" className={getNavLinkClass}>
                                 Dashboard
-                            </a>
-                            <a href="#" className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
+                            </NavLink>
+                            <NavLink to="/log-sleep" className={getNavLinkClass}>
+                                Log Sleep
+                            </NavLink>
+                            <NavLink to="/history" className={getNavLinkClass}>
                                 History
-                            </a>
-                            <a href="#" className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
-                                Reports
-                            </a>
+                            </NavLink>
                         </div>
                     </div>
                     <div className="hidden sm:ml-6 sm:flex sm:items-center gap-4">
