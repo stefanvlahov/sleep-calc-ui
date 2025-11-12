@@ -1,6 +1,6 @@
 ### Sleep Debt Calculator UI (Vite + React + TypeScript)
 
-Last updated: 2025-10-07
+Last updated: 2025-11-11
 
 A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React + TS template) and tested with Vitest + React Testing Library. This UI now supports JWT-based authentication for registration, login, and authenticated API calls with a modern, responsive UI built with Tailwind CSS.
 
@@ -19,6 +19,10 @@ A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React +
 - Displays loading and error states during API calls
 - Card-based layout for better visual hierarchy
 - Shows formatted results to one decimal place: Current Sleep Debt and Current Sleep Surplus
+- Dashboard overview:
+  - Overall Sleep Debt and Overall Sleep Surplus cards
+  - 7-day average of hours slept based on recent entries
+  - Recent Sleep Entries table with date, hours slept, target (7.5h), and daily debt/surplus indicator
 - Comprehensive unit tests for all major components
 
 ---
@@ -63,6 +67,18 @@ A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React +
     - Current Sleep Surplus: <value>
 - The app also fetches your initial state from GET /api/sleep/state when you log in
 - If a request fails or returns non-OK, an error message is shown
+
+3) Dashboard overview (requires login)
+- The Dashboard fetches both your current state and recent sleep history in parallel:
+  - GET /api/sleep/state → overall `sleepDebt` and `sleepSurplus`
+  - GET /api/sleep/history → recent entries list
+- It displays three cards:
+  - Overall Sleep Debt (red if > 0)
+  - Overall Sleep Surplus (green if > 0)
+  - 7-Day Average of hours slept, computed from the fetched recent entries
+- Recent Sleep Entries table shows:
+  - Date, Hours Slept, Target (7.5), and Daily Debt/Surplus (`hoursSlept - 7.5`), formatted to one decimal. Positive values are shown with a leading “+” and green color; negatives are red.
+- From the table header you can follow the "View all" link, which is intended for a full history page.
 
 ---
 
@@ -112,9 +128,18 @@ Sleep (requires Authorization: Bearer <token>)
   - Body: { "timeSlept": "HH:MM" }
   - Response: { "sleepDebt": number, "sleepSurplus": number }
 
+- Get recent history: GET http://localhost:8080/api/sleep/history
+  - Response: Array<{
+      "sleepDate": string,          // ISO date or yyyy-MM-dd
+      "hoursSlept": number,        // e.g., 7.5
+      "sleepDebt": number,         // running total or daily debt depending on backend
+      "sleepSurplus": number       // running total or daily surplus depending on backend
+    }>
+
 Notes
 - Minutes are padded to 2 digits before sending (e.g., "8:5" -> "08:05").
 - Values are displayed with one decimal point.
+- The Dashboard uses a client-side target of 7.5 hours/night to compute and display each entry's daily debt/surplus.
 
 ---
 
@@ -129,9 +154,10 @@ Notes
 
 ### Project Structure
 - src/
-    - App.tsx – Main container; orchestrates auth flow and renders AuthPage or SleepTracker
+    - App.tsx – Main container; orchestrates auth flow and renders Dashboard and/or SleepTracker
     - pages/
         - AuthPage.tsx – Unified authentication page with login/register toggle and split-screen layout
+        - Dashboard.tsx – Authenticated dashboard showing overall state, 7-day average, and recent entries
     - components/
         - Layout.tsx – Wrapper component providing navbar and consistent page structure
         - Navbar.tsx – Navigation bar with branding, menu items, logout button, and user avatar
@@ -140,6 +166,8 @@ Notes
         - SleepTracker.tsx – Authenticated view that fetches initial state and records sleep with token
         - LoginForm.tsx – Collects username/password and triggers login with Tailwind styling
         - RegistrationForm.tsx – Collects username/password and triggers registration with Tailwind styling
+    - utils/
+        - api.ts – `fetchWithAuth` helper that attaches the JWT and logs out on 401/403
     - context/
         - AuthContext.ts – React context type and instance
         - AuthProvider.tsx – Provides token, login, logout (persists token to localStorage)
@@ -162,6 +190,7 @@ Notes
     - src/components/RegistrationForm.test.tsx – Form interactions for registration
     - src/components/SleepInputForm.test.tsx – Component-level tests for inputs and submission
     - src/components/SleepTracker.test.tsx – Sleep tracking component with mocked API calls
+    - Note: Add tests for Dashboard and history rendering as needed.
 - Run tests: npm run test
 
 ---
