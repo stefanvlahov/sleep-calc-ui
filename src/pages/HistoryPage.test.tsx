@@ -1,10 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import * as api from '../utils/api';
-import { HistoryPage } from './HistoryPage';
+import HistoryPage from "./HistoryPage"
 import { AuthProvider } from '../context/AuthProvider';
 import { BrowserRouter } from 'react-router-dom';
 
+vi.mock('react-datepicker', () => ({
+    __esModule: true,
+    default: () => <div data-testid="mock-datepicker">Calendar Widget</div>,
+}));
 
 vi.mock('../utils/api.ts', () => ({
     fetchWithAuth: vi.fn(),
@@ -25,6 +29,11 @@ const renderWithProviders = (ui: React.ReactNode) => {
             </BrowserRouter>
         </AuthProvider>
     );
+};
+
+const formatLocalYmd = (date: Date) => {
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offset).toISOString().split('T')[0];
 };
 
 describe('HistoryPage', () => {
@@ -91,10 +100,10 @@ describe('HistoryPage', () => {
     });
 
     it('should display sleep details when data is present for the selected date', async () => {
-        const today = new Date().toISOString().split('T')[0];
+        const todayStr = formatLocalYmd(new Date());
         const mockData = [{
-            sleepDate: today,
-            hoursSlept: 7.5,
+            sleepDate: todayStr,
+            hoursSlept: 8.0,
             sleepDebt: 0.0,
             sleepSurplus: 1.5
         }];
@@ -106,8 +115,8 @@ describe('HistoryPage', () => {
         renderWithProviders(<HistoryPage />);
 
         await waitFor(() => {
-            expect(screen.getByText('7.50 hrd')).toBeInTheDocument();
-            expect(screen.getByText('+1.50 hrs')).toBeInTheDocument();
+            expect(screen.getByText('7h 30m')).toBeInTheDocument();
+            expect(screen.getByText('+1h 30m')).toBeInTheDocument();
         });
     })
 

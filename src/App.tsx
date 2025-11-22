@@ -4,6 +4,7 @@ import { useState } from "react";
 import AuthPage from "./pages/AuthPage.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import { Routes, Route, Navigate } from "react-router-dom";
+import HistoryPage from "./pages/HistoryPage.tsx";
 
 function App() {
     const { token, login } = useAuth();
@@ -50,6 +51,7 @@ function App() {
             <Routes>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/log-sleep" element={<SleepTracker />} />
+                <Route path="/history" element={<HistoryPage />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
             </Routes>
         );
