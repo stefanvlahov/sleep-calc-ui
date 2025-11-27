@@ -25,7 +25,7 @@ function HistoryPage() {
         const start = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
         // Date(year, month + 1, 0) gets the last day of the current month
         const end = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0);
-        
+
         const fmt = (d: Date) => {
             const offset = d.getTimezoneOffset() * 60000;
             return new Date(d.getTime() - offset).toISOString().split('T')[0];
@@ -82,19 +82,24 @@ function HistoryPage() {
         return `${hours}h ${mm}m`;
     };
 
-    // Function to determine class name for calendar days based on data
-    const getDayClassName = (date: Date): string => {
+    // Custom renderer for calendar days
+    const renderDayContents = (day: number, date: Date) => {
         const offset = date.getTimezoneOffset() * 60000;
         const dateString = new Date(date.getTime() - offset).toISOString().split('T')[0];
-
         const entry = historyData.find(e => e.sleepDate === dateString);
 
-        if (!entry) return '';
+        let barColor = 'bg-transparent';
+        if (entry) {
+            if (entry.hoursSlept >= 7.5) barColor = 'bg-green-500';
+            else barColor = 'bg-red-500';
+        }
 
-        // Green for surplus, Red for debt
-        if (entry.sleepSurplus > 0) return 'bg-green-200 text-green-800 font-bold rounded-full';
-        if (entry.sleepDebt > 0) return 'bg-red-200 text-red-800 font-bold rounded-full';
-        return '';
+        return (
+            <div className="flex flex-col items-center justify-center h-full w-full relative">
+                <span className="text-sm text-gray-700 z-10">{day}</span>
+                <div className={`h-1 w-6 mt-1 rounded-full ${barColor}`} />
+            </div>
+        );
     };
 
     return (
@@ -113,7 +118,9 @@ function HistoryPage() {
                             onChange={(date) => date && setSelectedDate(date)}
                             onMonthChange={(date) => setViewDate(date)}
                             inline
-                            dayClassName={getDayClassName}
+                            renderDayContents={renderDayContents}
+                            calendarClassName="border-none shadow-none"
+                            dayClassName={() => "h-10 w-10 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors"}
                         />
                     </div>
 
