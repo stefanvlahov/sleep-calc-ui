@@ -19,10 +19,14 @@ A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React +
 - Displays loading and error states during API calls
 - Card-based layout for better visual hierarchy
 - Shows formatted results to one decimal place: Current Sleep Debt and Current Sleep Surplus
-- Dashboard overview:
+- **Dashboard & Reports:**
   - Overall Sleep Debt and Overall Sleep Surplus cards
   - 7-day average of hours slept based on recent entries
   - Recent Sleep Entries table with date, hours slept, target (7.5h), and daily debt/surplus indicator
+- **History Visualization:**
+  - Interactive calendar view of sleep history
+  - Color-coded indicators (Green for >= 7.5h, Red for < 7.5h)
+  - Detailed daily breakdown showing Sleep Duration, Target, Sleep Surplus, and Cumulative Debt
 - Comprehensive unit tests for all major components
 
 ---
@@ -32,7 +36,11 @@ A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React +
 - npm 9+ (or a compatible package manager)
 - A running backend API
   - Auth endpoints: POST http://localhost:8080/api/auth/register and POST http://localhost:8080/api/auth/login
-  - Sleep endpoints (protected): GET http://localhost:8080/api/sleep/state and POST http://localhost:8080/api/sleep
+  - Sleep endpoints (protected):
+    - GET http://localhost:8080/api/sleep/state
+    - POST http://localhost:8080/api/sleep
+    - GET http://localhost:8080/api/sleep/history
+    - GET http://localhost:8080/api/sleep/history/range
 - Note: The Vite dev server proxies `/api` requests to `http://localhost:8080` automatically
 
 ---
@@ -68,7 +76,7 @@ A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React +
 - The app also fetches your initial state from GET /api/sleep/state when you log in
 - If a request fails or returns non-OK, an error message is shown
 
-3) Dashboard overview (requires login)
+3) Dashboard & Reports (requires login)
 - The Dashboard fetches both your current state and recent sleep history in parallel:
   - GET /api/sleep/state → overall `sleepDebt` and `sleepSurplus`
   - GET /api/sleep/history → recent entries list
@@ -78,7 +86,20 @@ A lightweight front-end UI for a Sleep Debt Calculator. Built with Vite (React +
   - 7-Day Average of hours slept, computed from the fetched recent entries
 - Recent Sleep Entries table shows:
   - Date, Hours Slept, Target (7.5), and Daily Debt/Surplus (`hoursSlept - 7.5`), formatted to one decimal. Positive values are shown with a leading “+” and green color; negatives are red.
-- From the table header you can follow the "View all" link, which is intended for a full history page.
+
+4) History View (requires login)
+- Accessed via the "History" link in the navbar or "View all" on the dashboard.
+- Displays an interactive calendar populated with your sleep data.
+- **Calendar Visualization:**
+  - Days with >= 7.5 hours of sleep are marked with a green bar.
+  - Days with < 7.5 hours are marked with a red bar.
+- **Detailed Daily Stats:**
+  - Clicking on a date in the calendar reveals detailed statistics for that day:
+    - Sleep Duration (e.g., "8h 30m")
+    - Target (fixed at 7.5h)
+    - Sleep Surplus (positive difference)
+    - Cumulative Debt (accumulated debt up to that point)
+- Data is fetched dynamically as you navigate between months using the `/api/sleep/history/range` endpoint.
 
 ---
 
@@ -136,6 +157,9 @@ Sleep (requires Authorization: Bearer <token>)
       "sleepSurplus": number       // running total or daily surplus depending on backend
     }>
 
+- Get history range: GET http://localhost:8080/api/sleep/history/range?from=YYYY-MM-DD&to=YYYY-MM-DD
+  - Response: Array<SleepHistoryEntry> (same structure as above)
+
 Notes
 - Minutes are padded to 2 digits before sending (e.g., "8:5" -> "08:05").
 - Values are displayed with one decimal point.
@@ -154,10 +178,11 @@ Notes
 
 ### Project Structure
 - src/
-    - App.tsx – Main container; orchestrates auth flow and renders Dashboard and/or SleepTracker
+    - App.tsx – Main container; orchestrates auth flow and renders Dashboard, SleepTracker, and HistoryPage
     - pages/
         - AuthPage.tsx – Unified authentication page with login/register toggle and split-screen layout
         - Dashboard.tsx – Authenticated dashboard showing overall state, 7-day average, and recent entries
+        - HistoryPage.tsx – Dedicated history view with calendar and detailed daily stats
     - components/
         - Layout.tsx – Wrapper component providing navbar and consistent page structure
         - Navbar.tsx – Navigation bar with branding, menu items, logout button, and user avatar
@@ -186,11 +211,11 @@ Notes
 - Unit tests use Vitest and React Testing Library:
     - src/App.test.tsx – App-level integration tests
     - src/pages/AuthPage.test.tsx – Authentication page interactions and toggle behavior
+    - src/pages/HistoryPage.test.tsx - Tests for history visualization and interactions
     - src/components/LoginForm.test.tsx – Form interactions for login
     - src/components/RegistrationForm.test.tsx – Form interactions for registration
     - src/components/SleepInputForm.test.tsx – Component-level tests for inputs and submission
     - src/components/SleepTracker.test.tsx – Sleep tracking component with mocked API calls
-    - Note: Add tests for Dashboard and history rendering as needed.
 - Run tests: npm run test
 
 ---
