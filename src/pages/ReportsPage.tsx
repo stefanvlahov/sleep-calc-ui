@@ -3,19 +3,37 @@ import Layout from '../components/Layout';
 import WeeklySleepDebtChart from '../components/WeeklySleepDebtChart';
 import WeeklySleepTrendChart from '../components/WeeklySleepTrendChart';
 import { useAuth } from '../hooks/useAuth';
+import { fetchWithAuth } from '../utils/api';
 
-// Mock data interfaces (replace with actual API types)
+// Interfaces matching backend DTOs
+interface DailyReportItem {
+    date: string;
+    hoursSlept: number;
+    debtChange: number;
+    surplusChange: number;
+}
+
+interface WeeklyReportDTO {
+    netSleepDebt: number;
+    netSleepSurplus: number;
+    percentageChange: number;
+    dailyItems: DailyReportItem[];
+}
+
+interface WeeklyReportItem {
+    weekLabel: string;
+    averageHoursSlept: number;
+}
+
+interface MonthlyReportDTO {
+    averageHoursSlept: number;
+    percentageChange: number;
+    weeklyItems: WeeklyReportItem[];
+}
+
 interface ReportsData {
-    weeklyDebt: {
-        totalDebt: number;
-        percentChange: number;
-        dailyData: { day: string; debt: number }[];
-    };
-    weeklyTrend: {
-        trendValue: number;
-        percentChange: number;
-        weeklyData: { day: string; hours: number }[];
-    };
+    weekly: WeeklyReportDTO;
+    monthly: MonthlyReportDTO;
 }
 
 const ReportsPage = () => {
@@ -30,42 +48,22 @@ const ReportsPage = () => {
             setIsLoading(true);
             setError(null);
             try {
-                // TODO: Replace with actual API call
-                // const response = await fetchWithAuth(`/api/reports/${timeRange}`, {}, logout);
-                // if (!response.ok) throw new Error('Failed to fetch reports data');
-                // const result = await response.json();
-                // setData(result);
+                // Fetch both weekly and monthly reports
+                const [weeklyResponse, monthlyResponse] = await Promise.all([
+                    fetchWithAuth('/api/reports/weekly', {}, logout),
+                    fetchWithAuth('/api/reports/monthly', {}, logout)
+                ]);
 
-                // Mocking data for now as per plan/assumption
-                // Simulating API delay
-                await new Promise(resolve => setTimeout(resolve, 500));
+                if (!weeklyResponse.ok) throw new Error('Failed to fetch weekly report');
+                if (!monthlyResponse.ok) throw new Error('Failed to fetch monthly report');
+
+                const weeklyData: WeeklyReportDTO = await weeklyResponse.json();
+                const monthlyData: MonthlyReportDTO = await monthlyResponse.json();
 
                 setData({
-                    weeklyDebt: {
-                        totalDebt: 5.5,
-                        percentChange: 10,
-                        dailyData: [
-                            { day: 'Mon', debt: 0.5 },
-                            { day: 'Tue', debt: -1.2 },
-                            { day: 'Wed', debt: 2.0 },
-                            { day: 'Thu', debt: 1.5 },
-                            { day: 'Fri', debt: -0.5 },
-                            { day: 'Sat', debt: 3.0 },
-                            { day: 'Sun', debt: 0.2 },
-                        ]
-                    },
-                    weeklyTrend: {
-                        trendValue: -2.25,
-                        percentChange: -5,
-                        weeklyData: [
-                            { day: 'Week 1', hours: 6.5 },
-                            { day: 'Week 2', hours: 7.2 },
-                            { day: 'Week 3', hours: 5.8 },
-                            { day: 'Week 4', hours: 7.5 },
-                        ]
-                    }
+                    weekly: weeklyData,
+                    monthly: monthlyData
                 });
-
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'An unknown error occurred');
             } finally {
@@ -74,7 +72,7 @@ const ReportsPage = () => {
         };
 
         void fetchReports();
-    }, [timeRange, logout]);
+    }, [logout]);
 
     return (
         <Layout>
@@ -120,15 +118,15 @@ const ReportsPage = () => {
                 {!isLoading && data && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <WeeklySleepDebtChart
-                            data={data.weeklyDebt.dailyData}
-                            totalDebt={data.weeklyDebt.totalDebt}
-                            percentChange={data.weeklyDebt.percentChange}
+                            data={data.weekly.dailyItems}
+                            totalDebt={data.weekly.netSleepDebt}
+                            totalSurplus={data.weekly.netSleepSurplus}
+                            percentChange={data.weekly.percentageChange}
                         />
                         <WeeklySleepTrendChart
-                            data={data.weeklyTrend.weeklyData}
-                            trendValue={data.weeklyTrend.trendValue}
-                            percentChange={data.weeklyTrend.percentChange}
-                            averageHours={7.5} // Mock value
+                            data={data.monthly.weeklyItems}
+                            averageHours={data.monthly.averageHoursSlept}
+                            percentChange={data.monthly.percentageChange}
                         />
                     </div>
                 )}

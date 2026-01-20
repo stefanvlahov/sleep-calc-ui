@@ -3,14 +3,14 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import ReportsPage from './ReportsPage';
 import { AuthProvider } from '../context/AuthProvider';
+import { fetchWithAuth } from '../utils/api';
 
-// Mock the API and Auth
+// Mock the API
 vi.mock('../utils/api', () => ({
     fetchWithAuth: vi.fn(),
 }));
 
-// Mock Recharts to avoid rendering issues in test environment if needed, 
-// but usually it works fine with jsdom. If not, we can mock ResizeObserver.
+// Mock ResizeObserver for recharts
 global.ResizeObserver = class ResizeObserver {
     observe() { }
     unobserve() { }
@@ -30,6 +30,42 @@ vi.mock('recharts', async () => {
 
 describe('ReportsPage', () => {
     it('renders the reports page title', async () => {
+        // Mock the API responses
+        const mockWeeklyData = {
+            netSleepDebt: 2.5,
+            netSleepSurplus: 0,
+            percentageChange: 10,
+            dailyItems: [
+                { date: '2026-01-13', hoursSlept: 7, debtChange: 0.5, surplusChange: 0 },
+                { date: '2026-01-14', hoursSlept: 8, debtChange: 0, surplusChange: 0.5 },
+            ]
+        };
+
+        const mockMonthlyData = {
+            averageHoursSlept: 7.2,
+            percentageChange: -5,
+            weeklyItems: [
+                { weekLabel: 'Week 1', averageHoursSlept: 6.5 },
+                { weekLabel: 'Week 2', averageHoursSlept: 7.2 },
+            ]
+        };
+
+        vi.mocked(fetchWithAuth).mockImplementation((url: string) => {
+            if (url.includes('/weekly')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockWeeklyData)
+                } as Response);
+            }
+            if (url.includes('/monthly')) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve(mockMonthlyData)
+                } as Response);
+            }
+            return Promise.reject(new Error('Unknown URL'));
+        });
+
         render(
             <AuthProvider>
                 <MemoryRouter>
@@ -41,7 +77,7 @@ describe('ReportsPage', () => {
         expect(screen.getByText('Sleep Reports')).toBeInTheDocument();
         expect(screen.getByText('Loading reports...')).toBeInTheDocument();
 
-        // Wait for mock data to load (simulated delay in component)
+        // Wait for data to load
         await waitFor(() => {
             expect(screen.queryByText('Loading reports...')).not.toBeInTheDocument();
         }, { timeout: 2000 });
@@ -50,3 +86,4 @@ describe('ReportsPage', () => {
         expect(screen.getByText('Weekly Sleep Hours Trend')).toBeInTheDocument();
     });
 });
+
