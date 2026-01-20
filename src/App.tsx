@@ -3,13 +3,17 @@ import SleepTracker from "./components/SleepTracker.tsx";
 import { useState } from "react";
 import AuthPage from "./pages/AuthPage.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import HistoryPage from "./pages/HistoryPage.tsx";
 import ReportsPage from "./pages/ReportsPage.tsx";
+import AuthLayout from "./components/AuthLayout.tsx";
+import ForgotPasswordForm from "./components/ForgotPasswordForm.tsx";
+import ResetPasswordForm from "./components/ResetPasswordForm.tsx";
 
 function App() {
     const { token, login } = useAuth();
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const handleRegister = async (username: string, password: string) => {
         setError(null);
@@ -47,6 +51,32 @@ function App() {
         }
     };
 
+    const handleForgotPassword = async (email: string) => {
+        setError(null);
+        try {
+            // Mock backend call
+            console.log(`Requesting password reset for ${email}`);
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+            alert('If an account exists for that email, a password reset link has been sent.');
+            navigate('/login');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        }
+    };
+
+    const handleResetPassword = async (password: string) => {
+        setError(null);
+        try {
+            // Mock backend call
+            console.log(`Resetting password to ${password}`);
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+            alert('Password reset successful. Please login with your new password.');
+            navigate('/login');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        }
+    };
+
     if (token) {
         return (
             <Routes>
@@ -62,6 +92,16 @@ function App() {
     return (
         <Routes>
             <Route path="/login" element={<AuthPage onLogin={handleLogin} onRegister={handleRegister} error={error} />} />
+            <Route path="/forgot-password" element={
+                <AuthLayout title="Forgot Password" subtitle="Enter your email to reset your password" error={error}>
+                    <ForgotPasswordForm onForgotPassword={handleForgotPassword} />
+                </AuthLayout>
+            } />
+            <Route path="/reset-password" element={
+                <AuthLayout title="Reset Password" subtitle="Enter your new password" error={error}>
+                    <ResetPasswordForm onResetPassword={handleResetPassword} />
+                </AuthLayout>
+            } />
             <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
     );
