@@ -74,6 +74,43 @@ const ReportsPage = () => {
         void fetchReports();
     }, [logout]);
 
+    const handleExport = async () => {
+        try {
+            const toDate = new Date();
+            const fromDate = new Date();
+
+            if (timeRange === 'weekly') {
+                fromDate.setDate(toDate.getDate() - 7);
+            } else {
+                fromDate.setDate(toDate.getDate() - 30);
+            }
+
+            const toStr = toDate.toISOString().split('T')[0];
+            const fromStr = fromDate.toISOString().split('T')[0];
+
+            const response = await fetchWithAuth(
+                `/api/reports/export?from=${fromStr}&to=${toStr}`,
+                {},
+                logout
+            );
+
+            if (!response.ok) throw new Error('Failed to export report');
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sleep_report_${fromStr}_to_${toStr}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (err) {
+            console.error('Export failed:', err);
+            setError(err instanceof Error ? err.message : 'Export failed');
+        }
+    };
+
     return (
         <Layout>
             <div className="max-w-7xl mx-auto px-4 py-8">
@@ -104,7 +141,10 @@ const ReportsPage = () => {
                         </button>
                     </div>
 
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center gap-2 font-medium">
+                    <button
+                        onClick={handleExport}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center gap-2 font-medium"
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>

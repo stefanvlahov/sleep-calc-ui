@@ -85,5 +85,51 @@ describe('ReportsPage', () => {
         expect(screen.getByText('Weekly Sleep Debt/Surplus')).toBeInTheDocument();
         expect(screen.getByText('Weekly Sleep Hours Trend')).toBeInTheDocument();
     });
+
+    it('triggers export API call when export button is clicked', async () => {
+        // Mock blob and URL.createObjectURL
+        window.URL.createObjectURL = vi.fn().mockReturnValue('blob:http://localhost:3000/123');
+        window.URL.revokeObjectURL = vi.fn();
+
+        const mockBlob = new Blob(['date,hours\n2025-01-01,8'], { type: 'text/csv' });
+
+        vi.mocked(fetchWithAuth).mockImplementation((url: string) => {
+            if (url.includes('/export')) {
+                return Promise.resolve({
+                    ok: true,
+                    blob: () => Promise.resolve(mockBlob)
+                } as Response);
+            }
+            // Return empty weekly/monthly data to pass the initial load
+            return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ dailyItems: [], weeklyItems: [] }) // Minimal structure
+            } as Response);
+        });
+
+        render(
+            <AuthProvider>
+                <MemoryRouter>
+                    <ReportsPage />
+                </MemoryRouter>
+            </AuthProvider>
+        );
+
+        // Wait for initial load
+        await waitFor(() => {
+            expect(screen.queryByText('Loading reports...')).not.toBeInTheDocument();
+        });
+
+        const exportButton = screen.getByText('Export Report');
+        exportButton.click();
+
+        await waitFor(() => {
+            expect(fetchWithAuth).toHaveBeenCalledWith(
+                expect.stringContaining('/api/reports/export'),
+                expect.any(Object),
+                expect.any(Function)
+            );
+        });
+    });
 });
 
