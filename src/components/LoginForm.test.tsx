@@ -2,10 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import userEvent from "@testing-library/user-event";
 import LoginForm from './LoginForm';
+import { BrowserRouter } from 'react-router-dom';
 
 describe('LoginForm', () => {
     it('should render username and password fields, and a login button', () => {
-        render(<LoginForm onLogin={vi.fn()} />);
+        render(
+            <BrowserRouter>
+                <LoginForm onLogin={vi.fn()} />
+            </BrowserRouter>
+        );
 
         expect(screen.getByPlaceholderText(/email or username/i)).toBeInTheDocument();
         expect(screen.getByPlaceholderText(/password/i)).toBeInTheDocument();
@@ -16,7 +21,11 @@ describe('LoginForm', () => {
         const user = userEvent.setup();
         const mockOnLogin = vi.fn();
 
-        render(<LoginForm onLogin={mockOnLogin} />);
+        render(
+            <BrowserRouter>
+                <LoginForm onLogin={mockOnLogin} />
+            </BrowserRouter>
+        );
 
         const usernameInput = screen.getByPlaceholderText(/email or username/i);
         const passwordInput = screen.getByPlaceholderText(/password/i);

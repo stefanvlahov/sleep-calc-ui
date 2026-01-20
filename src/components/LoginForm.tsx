@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 interface LoginFormProps {
     onLogin: (username: string, password: string) => Promise<void>;
@@ -38,7 +39,7 @@ function LoginForm({ onLogin }: LoginFormProps) {
                 />
             </div>
             <div className="text-left">
-                <a href="#" className="text-sm text-blue-500 hover:underline">Forgot Password?</a>
+                <Link to="/forgot-password" className="text-sm text-blue-500 hover:underline">Forgot Password?</Link>
             </div>
             <button
                 type="submit"
