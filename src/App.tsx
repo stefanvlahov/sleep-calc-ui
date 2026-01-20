@@ -5,6 +5,7 @@ import AuthPage from "./pages/AuthPage.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import { Routes, Route, Navigate } from "react-router-dom";
 import HistoryPage from "./pages/HistoryPage.tsx";
+import ReportsPage from "./pages/ReportsPage.tsx";
 
 function App() {
     const { token, login } = useAuth();
@@ -34,7 +35,7 @@ function App() {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({username, password }),
+                body: JSON.stringify({ username, password }),
             });
             if (!response.ok) throw new Error('Login failed. Please check your credentials.');
             const data = await response.json() as { token: string };
@@ -52,6 +53,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/log-sleep" element={<SleepTracker />} />
                 <Route path="/history" element={<HistoryPage />} />
+                <Route path="/reports" element={<ReportsPage />} />
                 <Route path="*" element={<Navigate to="/dashboard" />} />
             </Routes>
         );
