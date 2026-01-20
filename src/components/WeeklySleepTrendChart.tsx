@@ -1,15 +1,25 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+interface WeeklyReportItem {
+    weekLabel: string;
+    averageHoursSlept: number;
+}
+
 interface WeeklySleepTrendChartProps {
-    data: { day: string; hours: number }[];
-    averageHours: number; // Or change relative to last week? The design shows "-2h 15m" and "Last 4 Weeks -5%". I'll stick to the design.
-    trendValue: number; // e.g. -2.25 (hours)
+    data: WeeklyReportItem[];
+    averageHours: number;
     percentChange: number;
 }
 
-const WeeklySleepTrendChart = ({ data, trendValue, percentChange }: WeeklySleepTrendChartProps) => {
-    const isPositive = trendValue >= 0;
-    const formattedTrend = `${Math.floor(Math.abs(trendValue))}h ${Math.round((Math.abs(trendValue) % 1) * 60)}m`;
+const WeeklySleepTrendChart = ({ data, averageHours, percentChange }: WeeklySleepTrendChartProps) => {
+    const isPositive = percentChange >= 0;
+    const formattedAverage = `${Math.floor(averageHours)}h ${Math.round((averageHours % 1) * 60)}m`;
+
+    // Transform data for the chart
+    const chartData = data.map(item => ({
+        day: item.weekLabel,
+        hours: item.averageHoursSlept
+    }));
 
     return (
         <div className="bg-white rounded-lg shadow-md p-6 flex flex-col h-full">
@@ -17,7 +27,7 @@ const WeeklySleepTrendChart = ({ data, trendValue, percentChange }: WeeklySleepT
 
             <div className="mb-6">
                 <div className={`text-4xl font-bold ${isPositive ? 'text-green-500' : 'text-red-500'} mb-2`}>
-                    {isPositive ? '+' : '-'}{formattedTrend}
+                    {formattedAverage}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                     <span>Last 4 Weeks</span>
@@ -38,7 +48,7 @@ const WeeklySleepTrendChart = ({ data, trendValue, percentChange }: WeeklySleepT
 
             <div className="flex-grow min-h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data}>
+                    <AreaChart data={chartData}>
                         <defs>
                             <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />

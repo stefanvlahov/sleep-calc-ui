@@ -1,14 +1,32 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
+interface DailyReportItem {
+    date: string;
+    hoursSlept: number;
+    debtChange: number;
+    surplusChange: number;
+}
+
 interface WeeklySleepDebtChartProps {
-    data: { day: string; debt: number }[];
+    data: DailyReportItem[];
     totalDebt: number;
+    totalSurplus: number;
     percentChange: number;
 }
 
-const WeeklySleepDebtChart = ({ data, totalDebt, percentChange }: WeeklySleepDebtChartProps) => {
-    const isSurplus = totalDebt >= 0;
-    const formattedDebt = `${Math.floor(Math.abs(totalDebt))}h ${Math.round((Math.abs(totalDebt) % 1) * 60)}m`;
+const WeeklySleepDebtChart = ({ data, totalDebt, totalSurplus, percentChange }: WeeklySleepDebtChartProps) => {
+    // Determine if we're in surplus (positive is good) or debt (negative/debt is bad)
+    const netBalance = totalSurplus - totalDebt;
+    const isSurplus = netBalance >= 0;
+    const displayValue = isSurplus ? totalSurplus : totalDebt;
+    const formattedValue = `${Math.floor(Math.abs(displayValue))}h ${Math.round((Math.abs(displayValue) % 1) * 60)}m`;
+
+    // Transform data to include day name for display
+    const chartData = data.map(item => ({
+        ...item,
+        day: new Date(item.date).toLocaleDateString('en-US', { weekday: 'short' }),
+        debt: item.debtChange - item.surplusChange // Net change for the day
+    }));
 
     return (
         <div className="bg-white rounded-lg shadow-md p-6 flex flex-col h-full">
@@ -16,7 +34,7 @@ const WeeklySleepDebtChart = ({ data, totalDebt, percentChange }: WeeklySleepDeb
 
             <div className="mb-6">
                 <div className={`text-4xl font-bold ${isSurplus ? 'text-green-500' : 'text-red-500'} mb-2`}>
-                    {isSurplus ? '+' : '-'}{formattedDebt}
+                    {isSurplus ? '+' : '-'}{formattedValue}
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                     <span>This Week</span>
@@ -37,7 +55,7 @@ const WeeklySleepDebtChart = ({ data, totalDebt, percentChange }: WeeklySleepDeb
 
             <div className="flex-grow min-h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data}>
+                    <BarChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} dy={10} />
                         <YAxis hide />
@@ -46,7 +64,7 @@ const WeeklySleepDebtChart = ({ data, totalDebt, percentChange }: WeeklySleepDeb
                             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                         />
                         <Bar dataKey="debt" radius={[4, 4, 0, 0]}>
-                            {data.map((entry, index) => (
+                            {chartData.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.debt >= 0 ? '#10B981' : '#EF4444'} />
                             ))}
                         </Bar>
