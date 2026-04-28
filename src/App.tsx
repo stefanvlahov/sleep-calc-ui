@@ -3,7 +3,7 @@ import SleepTracker from "./components/SleepTracker.tsx";
 import { useState } from "react";
 import AuthPage from "./pages/AuthPage.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import HistoryPage from "./pages/HistoryPage.tsx";
 import ReportsPage from "./pages/ReportsPage.tsx";
 import AuthLayout from "./components/AuthLayout.tsx";
@@ -14,6 +14,7 @@ function App() {
     const { token, login } = useAuth();
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const handleRegister = async (username: string, password: string) => {
         setError(null);
@@ -51,13 +52,16 @@ function App() {
         }
     };
 
-    const handleForgotPassword = async (email: string) => {
+    const handleForgotPassword = async (username: string) => {
         setError(null);
         try {
-            // Mock backend call
-            console.log(`Requesting password reset for ${email}`);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
-            alert('If an account exists for that email, a password reset link has been sent.');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username }),
+            });
+            if (!response.ok) throw new Error('Request failed. Please try again.');
+            alert('If an account exists for that username, a password reset link has been sent.');
             navigate('/login');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -66,10 +70,18 @@ function App() {
 
     const handleResetPassword = async (password: string) => {
         setError(null);
+        const resetToken = searchParams.get('token');
+        if (!resetToken) {
+            setError('Missing reset token. Please use the link from your email.');
+            return;
+        }
         try {
-            // Mock backend call
-            console.log(`Resetting password to ${password}`);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: resetToken, newPassword: password }),
+            });
+            if (!response.ok) throw new Error('Reset failed. Your link may have expired.');
             alert('Password reset successful. Please login with your new password.');
             navigate('/login');
         } catch (err) {

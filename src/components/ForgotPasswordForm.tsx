@@ -2,26 +2,26 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 interface ForgotPasswordFormProps {
-    onForgotPassword: (email: string) => Promise<void>;
+    onForgotPassword: (username: string) => Promise<void>;
 }
 
 function ForgotPasswordForm({ onForgotPassword }: ForgotPasswordFormProps) {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        void onForgotPassword(email);
+        void onForgotPassword(username);
     };
 
     return (
         <form onSubmit={handleSubmit} aria-label="Forgot Password Form" className="space-y-4">
             <div>
                 <input
-                    id="forgot-password-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
+                    id="forgot-password-username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter your username"
                     className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     required
                 />
