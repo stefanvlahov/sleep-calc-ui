@@ -42,6 +42,8 @@ All sleep endpoints require `Authorization: Bearer <token>`.
 |--------|------|---------------|----------|
 | POST | `/api/auth/register` | `{ username, password }` | 200 OK |
 | POST | `/api/auth/login` | `{ username, password }` | `{ token }` |
+| POST | `/api/auth/forgot-password` | `{ username }` | 200 OK (silent on unknown username) |
+| POST | `/api/auth/reset-password` | `{ token, newPassword }` | 200 OK |
 | GET | `/api/sleep/state` | — | `{ sleepDebt, sleepSurplus }` |
 | POST | `/api/sleep` | `{ timeSlept: "HH:MM", date: "YYYY-MM-DD" }` | `{ sleepDebt, sleepSurplus }` |
 | GET | `/api/sleep/history` | — | `SleepHistoryEntry[]` |

@@ -24,6 +24,7 @@ function ResetPasswordForm({ onResetPassword }: ResetPasswordFormProps) {
         <form onSubmit={handleSubmit} aria-label="Reset Password Form" className="space-y-4">
             {error && <div className="text-red-500 text-sm">{error}</div>}
             <div>
+                <label htmlFor="reset-password" className="sr-only">New Password</label>
                 <input
                     id="reset-password"
                     type="password"
@@ -35,6 +36,7 @@ function ResetPasswordForm({ onResetPassword }: ResetPasswordFormProps) {
                 />
             </div>
             <div>
+                <label htmlFor="reset-password-confirm" className="sr-only">Confirm New Password</label>
                 <input
                     id="reset-password-confirm"
                     type="password"

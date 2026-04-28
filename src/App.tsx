@@ -1,9 +1,9 @@
 import { useAuth } from "./hooks/useAuth.ts";
 import SleepTracker from "./components/SleepTracker.tsx";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AuthPage from "./pages/AuthPage.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
-import { Routes, Route, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import HistoryPage from "./pages/HistoryPage.tsx";
 import ReportsPage from "./pages/ReportsPage.tsx";
 import AuthLayout from "./components/AuthLayout.tsx";
@@ -15,6 +15,11 @@ function App() {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const location = useLocation();
+
+    useEffect(() => {
+        setError(null);
+    }, [location.pathname]);
 
     const handleRegister = async (username: string, password: string) => {
         setError(null);
@@ -44,9 +49,8 @@ function App() {
             });
             if (!response.ok) throw new Error('Login failed. Please check your credentials.');
             const data = await response.json() as { token: string };
-            if (data.token) {
-                login(data.token);
-            }
+            if (!data.token) throw new Error('Login failed: no token received.');
+            login(data.token);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred');
         }
@@ -105,7 +109,7 @@ function App() {
         <Routes>
             <Route path="/login" element={<AuthPage onLogin={handleLogin} onRegister={handleRegister} error={error} />} />
             <Route path="/forgot-password" element={
-                <AuthLayout title="Forgot Password" subtitle="Enter your email to reset your password" error={error}>
+                <AuthLayout title="Forgot Password" subtitle="Enter your username to reset your password" error={error}>
                     <ForgotPasswordForm onForgotPassword={handleForgotPassword} />
                 </AuthLayout>
             } />

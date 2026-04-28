@@ -49,7 +49,8 @@ function SleepTracker() {
         setError(null);
         const timeSlept = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
 
-        const dateString = selectedDate.toISOString().split('T')[0];
+        const tzOffset = selectedDate.getTimezoneOffset() * 60000;
+        const dateString = new Date(selectedDate.getTime() - tzOffset).toISOString().split('T')[0];
 
         try {
             const response = await fetchWithAuth('/api/sleep', {
@@ -75,7 +76,7 @@ function SleepTracker() {
 
     return (
         <Layout>
-            { token && (
+            {token && (
                 <div>
                     <SleepInputForm
                         hoursValue={hours}

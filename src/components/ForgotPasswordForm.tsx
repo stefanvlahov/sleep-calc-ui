@@ -16,6 +16,7 @@ function ForgotPasswordForm({ onForgotPassword }: ForgotPasswordFormProps) {
     return (
         <form onSubmit={handleSubmit} aria-label="Forgot Password Form" className="space-y-4">
             <div>
+                <label htmlFor="forgot-password-username" className="sr-only">Username</label>
                 <input
                     id="forgot-password-username"
                     type="text"
